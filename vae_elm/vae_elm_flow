@@ -1,0 +1,13 @@
+digraph {
+	A [label="Input (15×5)"]
+	B [label="VAE Encoder"]
+	C [label="Latent Space (64D)"]
+	D [label="RBF Kernel"]
+	E [label="Linear Output"]
+	F [label=Prediction]
+	A -> B
+	B -> C
+	C -> D
+	D -> E
+	E -> F
+}

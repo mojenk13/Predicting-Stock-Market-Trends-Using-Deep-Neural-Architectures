@@ -1,0 +1,41 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+
+filename = "/Users/mollyjenkins/Desktop/final_project/group2/molly_code/historical_comparison/s&p500_data.csv"
+stock_data = pd.read_csv(filename, parse_dates=['Date'])
+stock_data.set_index('Date', inplace=True)
+
+features = ['Open', 'High', 'Low', 'Close', 'Volume']
+data = stock_data[features].copy()
+data = data.apply(pd.to_numeric, errors='coerce').dropna()
+
+scaler = MinMaxScaler()
+data_scaled = scaler.fit_transform(data)
+
+close_prices = data['Close'].values.reshape(-1, 1)
+close_scaler = MinMaxScaler()
+close_scaled = close_scaler.fit_transform(close_prices)
+
+input_window = 15
+X, y = [], []
+
+for i in range(len(data_scaled) - input_window):
+    X.append(data_scaled[i:i+input_window])
+    y.append(close_scaled[i+input_window])  
+
+X = np.array(X)
+y = np.array(y).reshape(-1, 1, 1)
+
+test_days = 1000
+
+if test_days >= len(X):
+    raise ValueError(f"test_days ({test_days}) is too large for dataset of size {len(X)}")
+
+X_train = X[:-test_days]
+y_train = y[:-test_days]
+X_test = X[-test_days:]
+y_test = y[-test_days:]
+
+print("# of training samples:", len(X_train))
+print("# of test samples:", len(X_test))
